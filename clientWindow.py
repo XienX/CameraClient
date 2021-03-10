@@ -68,12 +68,6 @@ class Ui_MainWindow(object):
         self.portInput = QtWidgets.QLineEdit(self.centralwidget)
         self.portInput.setObjectName("portInput")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.portInput)
-        self.CAMERA = QtWidgets.QLabel(self.centralwidget)
-        self.CAMERA.setObjectName("CAMERA")
-        self.formLayout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.CAMERA)
-        self.CameraNumInput = QtWidgets.QSpinBox(self.centralwidget)
-        self.CameraNumInput.setObjectName("CameraNumInput")
-        self.formLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.CameraNumInput)
         self.verticalLayout_2.addLayout(self.formLayout)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
@@ -172,12 +166,11 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "CameraController"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "CameraClient"))
         self.IP.setText(_translate("MainWindow", "服务器IP"))
         self.ipInput.setText(_translate("MainWindow", "127.0.0.1"))
         self.PORT.setText(_translate("MainWindow", "Port"))
         self.portInput.setText(_translate("MainWindow", "9800"))
-        self.CAMERA.setText(_translate("MainWindow", "Camera"))
         self.connectButton.setText(_translate("MainWindow", "连接"))
         self.closeButton.setText(_translate("MainWindow", "断开"))
         self.cameraLabel.setText(_translate("MainWindow", "摄像头画面"))
