@@ -44,8 +44,11 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
         message = json.loads(bytesMessage.decode())
 
         if message['code'] == 500:  # 数据长度通知
-            frame = self.recv_frame(message['data'])
-            self.show_camera(frame)
+            try:
+                frame = self.recv_frame(message['data'])
+                self.show_camera(frame)
+            except BaseException as e:
+                print(e)
 
     def recv_frame(self, size):  # 根据数据长度接受一帧数据，返回 numpy.ndarray
         receivedSize = 0
@@ -57,17 +60,16 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
             receivedSize += len(res)
             bytesMessage += res
 
-        message = json.loads(bytesMessage.decode())
-        if message['code'] == 350:
-            return np.asarray(message['data'], dtype='uint8')
-        else:
-            return -1
+        # message = json.loads(bytesMessage.decode())
+        # if message['code'] == 350:
+        #     # return np.asarray(message['data'], dtype='uint8')
+        #     return np.frombuffer(message['data'], dtype=np.uint8)
+        # else:
+        #     return -1
+        return np.frombuffer(bytesMessage, dtype=np.uint8).reshape(480, 640, 3)
 
     def show_camera(self, frame):  # 显示一帧
         # print(frame)
-        # print(frame.shape[1])
-        # print(frame.shape[0])
-        # print(frame.dtype)
         show = cv2.resize(frame, (400, 300))
         show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
         showImage = QImage(show.data, show.shape[1], show.shape[0], QImage.Format_RGB888)
