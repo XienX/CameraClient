@@ -5,16 +5,14 @@
 # @File : main.py
 # @notice ：
 
-import socket
 import sys
-import json
-import numpy as np
 
 import cv2
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QApplication
 
 from clientWindow import Ui_MainWindow
+from socketFrameThread import SocketFrameThread
 
 
 class ClientMainWindow(QMainWindow, Ui_MainWindow):
@@ -28,45 +26,15 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
         self.connectButton.clicked.connect(self.connect_server)
 
     def connect_server(self):  # 连接服务器
-        self.connect = socket.socket()  # 创建 socket 对象
+        # frameThread = Thread(target=self.socket_frame_thread)
+        # frameThread.setDaemon(True)
+        # frameThread.start()
+
         ip = self.ipInput.text()
         port = int(self.portInput.text())
-        self.connect.connect((ip, port))
-
-        message = {'code': 200}  # 登录
-        self.connect.send(json.dumps(message).encode())
-
-        message = self.connect.recv(1024).decode()
-        LoginCode = json.loads(message)['code']
-        print(LoginCode)
-
-        bytesMessage = self.connect.recv(1024)
-        message = json.loads(bytesMessage.decode())
-
-        if message['code'] == 500:  # 数据长度通知
-            try:
-                frame = self.recv_frame(message['data'])
-                self.show_camera(frame)
-            except BaseException as e:
-                print(e)
-
-    def recv_frame(self, size):  # 根据数据长度接受一帧数据，返回 numpy.ndarray
-        receivedSize = 0
-        bytesMessage = b''
-        print(size)
-
-        while receivedSize < size:
-            res = self.connect.recv(8192)
-            receivedSize += len(res)
-            bytesMessage += res
-
-        # message = json.loads(bytesMessage.decode())
-        # if message['code'] == 350:
-        #     # return np.asarray(message['data'], dtype='uint8')
-        #     return np.frombuffer(message['data'], dtype=np.uint8)
-        # else:
-        #     return -1
-        return np.frombuffer(bytesMessage, dtype=np.uint8).reshape(480, 640, 3)
+        self.frameThread = SocketFrameThread(ip, port)
+        self.frameThread._signal.connect(self.show_camera)  # 连接信号
+        self.frameThread.start()
 
     def show_camera(self, frame):  # 显示一帧
         # print(frame)
