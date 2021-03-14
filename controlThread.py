@@ -62,19 +62,21 @@ class ControlThread(QtCore.QThread):
                         if type(frame) == np.ndarray:
                             self.frame_signal.emit(frame)
 
+                    self.log_signal.emit('服务端断开了连接，可能所有的摄像头设备都已离线')
+
+                elif message['code'] == 320:
+                    self.log_signal.emit('无在线的摄像头设备，请上线摄像头后再登录')
+
             elif message['code'] == 301:
                 self.log_signal.emit('用户名或密码错误')
-                self.connect_button_signal.emit(True)
-                self.close_button_signal.emit(False)
             else:
                 self.log_signal.emit(f'非预期的code {message["code"]}')
-                self.connect_button_signal.emit(True)
-                self.close_button_signal.emit(False)
 
         except BaseException as e:
             self.log_signal.emit(f'连接错误: {e}')
-            self.connect_button_signal.emit(True)
-            self.close_button_signal.emit(False)
+
+        self.connect_button_signal.emit(True)
+        self.close_button_signal.emit(False)
 
     def recv_frame(self):  # 根据数据长度接受一帧数据，返回 numpy.ndarray
         receivedSize = 0
