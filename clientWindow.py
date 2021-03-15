@@ -112,9 +112,8 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.setStretch(0, 5)
         self.verticalLayout_2.setStretch(1, 3)
         self.horizontalLayout_2.addLayout(self.verticalLayout_2)
-        self.log = QtWidgets.QTextEdit(self.centralwidget)
-        self.log.setEnabled(False)
-        self.log.setMaximumSize(QtCore.QSize(16777215, 567))
+        self.log = QtWidgets.QTextBrowser(self.centralwidget)
+        self.log.setEnabled(True)
         self.log.setObjectName("log")
         self.horizontalLayout_2.addWidget(self.log)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
@@ -179,7 +178,6 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.ipInput, self.portInput)
         MainWindow.setTabOrder(self.portInput, self.connectButton)
         MainWindow.setTabOrder(self.connectButton, self.closeButton)
-        MainWindow.setTabOrder(self.closeButton, self.log)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

@@ -253,15 +253,9 @@
          </layout>
         </item>
         <item>
-         <widget class="QTextEdit" name="log">
+         <widget class="QTextBrowser" name="log">
           <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>567</height>
-           </size>
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -419,7 +413,6 @@
   <tabstop>portInput</tabstop>
   <tabstop>connectButton</tabstop>
   <tabstop>closeButton</tabstop>
-  <tabstop>log</tabstop>
  </tabstops>
  <resources/>
  <connections/>

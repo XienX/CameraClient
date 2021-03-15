@@ -7,6 +7,7 @@
 
 import json
 import socket
+import time
 
 import numpy as np
 from PyQt5 import QtCore
@@ -75,6 +76,7 @@ class ControlThread(QtCore.QThread):
         except BaseException as e:
             self.log_signal.emit(f'连接错误: {e}')
 
+        time.sleep(1)
         self.connect_button_signal.emit(True)
         self.close_button_signal.emit(False)
 
@@ -92,8 +94,11 @@ class ControlThread(QtCore.QThread):
             bytesMessage += res
 
         # print(receivedSize)
-        if receivedSize == self.frameLen:
-            return np.frombuffer(bytesMessage, dtype=np.uint8).reshape(480, 640, 3)
+        try:
+            if receivedSize == self.frameLen:
+                return np.frombuffer(bytesMessage, dtype=np.uint8).reshape(480, 640, 3)
+        except BaseException as e:
+            print(e)
         return None
 
     def close(self):  # 结束
