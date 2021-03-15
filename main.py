@@ -13,13 +13,16 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QApplication
 
 from clientWindow import Ui_MainWindow
+from register import RegisterUI
 from controlThread import ControlThread
 
 
 class ClientMainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self):
+    def __init__(self, ):
         super().__init__()
         self.setupUi(self)
+
+        self.registerUI = RegisterUI()
 
         self.controlThread = None
 
@@ -27,6 +30,7 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
 
     def slot_init(self):
         self.connectButton.clicked.connect(self.connect_server)
+        self.registerButton.clicked.connect(self.registerUI.show)
 
     def connect_server(self):  # 连接服务器
         self.controlThread = ControlThread(self.userNameInput.text(), self.passwordInput.text(),
@@ -58,6 +62,7 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:  # 关闭程序
         try:
             super().closeEvent(a0)
+            self.registerUI.close()
             # if self.camera:
             #     self.camera.close()
             if self.controlThread and self.controlThread.isRunning():
