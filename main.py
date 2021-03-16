@@ -30,6 +30,7 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
 
     def slot_init(self):
         self.connectButton.clicked.connect(self.connect_server)
+        self.closeButton.clicked.connect(self.close_connect)
         self.registerButton.clicked.connect(self.registerUI.show)
 
     def connect_server(self):  # 连接服务器
@@ -58,6 +59,9 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
     def control_close_button(self, b):  # 控制断开连接按钮
         if (self.closeButton.isEnabled() and not b) or (not self.closeButton.isEnabled() and b):
             self.closeButton.setEnabled(b)
+
+    def close_connect(self):  # 断开连接
+        self.controlThread.close()
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:  # 关闭程序
         try:

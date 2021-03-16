@@ -26,6 +26,7 @@ class RegisterUI(QMainWindow, Ui_RegisterDialog):
 
     def slot_init(self):
         self.registerButton.clicked.connect(self.register)
+        self.cancelButton.clicked.connect(self.cancel)
 
     def register(self):
         if self.userNameInputRegister.text() == '' or ' ' in self.userNameInputRegister.text() or \
@@ -48,6 +49,9 @@ class RegisterUI(QMainWindow, Ui_RegisterDialog):
 
     def print_tip(self, tip_str):
         self.tip.setText(tip_str)
+
+    def cancel(self):  # 取消按钮
+        self.close()
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         try:

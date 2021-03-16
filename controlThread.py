@@ -8,6 +8,7 @@
 import json
 import socket
 import time
+import traceback
 
 import numpy as np
 from PyQt5 import QtCore
@@ -74,9 +75,10 @@ class ControlThread(QtCore.QThread):
                 self.log_signal.emit(f'非预期的code {message["code"]}')
 
         except BaseException as e:
-            self.log_signal.emit(f'连接错误: {e}')
+            traceback.print_exc()
+            self.log_signal.emit('连接已断开')
 
-        time.sleep(1)
+        time.sleep(0.1)
         self.connect_button_signal.emit(True)
         self.close_button_signal.emit(False)
 
