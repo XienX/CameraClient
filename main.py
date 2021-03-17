@@ -44,8 +44,8 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
 
     def show_camera(self, frame):  # 显示一帧
         # print(frame)
-        show = cv2.resize(frame, (400, 300))
-        show = cv2.cvtColor(show, cv2.COLOR_BGR2RGB)
+        # show = cv2.resize(frame, (400, 300))
+        show = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         showImage = QImage(show.data, show.shape[1], show.shape[0], QImage.Format_RGB888)
         self.cameraLabel.setPixmap(QPixmap.fromImage(showImage))
 

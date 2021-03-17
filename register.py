@@ -89,7 +89,7 @@ class RegisterThread(QtCore.QThread):
             if message['code'] == 310:  # 注册成功
                 self.tip_signal.emit('已注册')
             elif message['code'] == 311:  # 注册失败
-                self.tip_signal.emit('用户名已存在')
+                self.tip_signal.emit('用户已存在')
             else:
                 self.tip_signal.emit(message['code'])
 
