@@ -38,8 +38,7 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
                                            self.ipInput.text(), int(self.portInput.text()))
         self.controlThread.frame_signal.connect(self.show_camera)  # 连接信号
         self.controlThread.log_signal.connect(self.print_log)
-        self.controlThread.connect_button_signal.connect(self.control_connect_button)
-        self.controlThread.close_button_signal.connect(self.control_close_button)
+        self.controlThread.enabled_signal.connect(self.control_enabled)
         self.controlThread.start()
 
     def show_camera(self, frame):  # 显示一帧
@@ -52,13 +51,13 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
     def print_log(self, log_str):  # UI上打印日志
         self.log.append(log_str)
 
-    def control_connect_button(self, b):  # 控制连接按钮
-        if (self.connectButton.isEnabled() and not b) or (not self.connectButton.isEnabled() and b):
-            self.connectButton.setEnabled(b)
-
-    def control_close_button(self, b):  # 控制断开连接按钮
-        if (self.closeButton.isEnabled() and not b) or (not self.closeButton.isEnabled() and b):
-            self.closeButton.setEnabled(b)
+    def control_enabled(self, b):  # 控制是否禁用
+        self.connectButton.setEnabled(b)
+        self.closeButton.setEnabled(not b)
+        self.userNameInput.setEnabled(b)
+        self.passwordInput.setEnabled(b)
+        self.ipInput.setEnabled(b)
+        self.portInput.setEnabled(b)
 
     def close_connect(self):  # 断开连接
         self.controlThread.close()

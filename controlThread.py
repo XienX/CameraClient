@@ -20,8 +20,7 @@ class ControlThread(QtCore.QThread):
     #  通过类成员对象定义信号对象
     frame_signal = pyqtSignal(np.ndarray)
     log_signal = pyqtSignal(str)
-    connect_button_signal = pyqtSignal(bool)
-    close_button_signal = pyqtSignal(bool)
+    enabled_signal = pyqtSignal(bool)
 
     def __init__(self, user_name, password, ip, port):
         super().__init__()
@@ -37,8 +36,8 @@ class ControlThread(QtCore.QThread):
 
     def run(self):
         try:
-            self.connect_button_signal.emit(False)
-            self.close_button_signal.emit(True)
+            self.enabled_signal.emit(False)
+
             self.connect.connect((self.ip, self.port))
 
             message = {'code': 200, 'userName': self.user_name, 'password': self.password}  # 登录
@@ -79,8 +78,8 @@ class ControlThread(QtCore.QThread):
             self.log_signal.emit('连接已断开')
 
         time.sleep(0.1)
-        self.connect_button_signal.emit(True)
-        self.close_button_signal.emit(False)
+
+        self.enabled_signal.emit(True)
 
     def recv_frame(self):  # 根据数据长度接受一帧数据，返回 numpy.ndarray
         receivedSize = 0

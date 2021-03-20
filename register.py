@@ -34,18 +34,18 @@ class RegisterUI(QMainWindow, Ui_RegisterDialog):
             self.tip.setText('为空或存在空格')
             return
 
-        self.registerButton.setEnabled(False)
-        self.tip.setText('注册中...')
-
         self.registerThread = RegisterThread(self.userNameInputRegister.text(), self.passwordInputRegister.text(),
                                              self.ipInputRegister.text(), int(self.portInputRegister.text()))
-        self.registerThread.register_button_signal.connect(self.control_register_button)
+        self.registerThread.enabled_signal.connect(self.control_enabled)
         self.registerThread.tip_signal.connect(self.print_tip)
         self.registerThread.start()
 
-    def control_register_button(self, b):
-        if (self.registerButton.isEnabled() and not b) or (not self.registerButton.isEnabled() and b):
-            self.registerButton.setEnabled(b)
+    def control_enabled(self, b):  # 控制是否禁用
+        self.registerButton.setEnabled(b)
+        self.userNameInputRegister.setEnabled(b)
+        self.passwordInputRegister.setEnabled(b)
+        self.ipInputRegister.setEnabled(b)
+        self.portInputRegister.setEnabled(b)
 
     def print_tip(self, tip_str):
         self.tip.setText(tip_str)
@@ -63,7 +63,7 @@ class RegisterUI(QMainWindow, Ui_RegisterDialog):
 
 
 class RegisterThread(QtCore.QThread):
-    register_button_signal = pyqtSignal(bool)
+    enabled_signal = pyqtSignal(bool)
     tip_signal = pyqtSignal(str)
 
     def __init__(self, user_name, password, ip, port):
@@ -77,6 +77,9 @@ class RegisterThread(QtCore.QThread):
 
     def run(self):
         try:
+            self.enabled_signal.emit(False)
+            self.tip_signal.emit('注册中...')
+
             self.connect.connect((self.ip, self.port))
 
             message = {'code': 210, 'userName': self.user_name, 'password': self.password}  # 注册
@@ -97,5 +100,5 @@ class RegisterThread(QtCore.QThread):
             print(e)
             self.tip_signal.emit('Error')
 
-        self.register_button_signal.emit(True)
+        self.enabled_signal.emit(True)
 
