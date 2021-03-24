@@ -3,7 +3,7 @@
 # @Author : XieXin
 # @Email : 1324548879@qq.com
 # @File : main.py
-# @notice ：
+# @notice ：程序入口，ClientMainWindow类
 
 import sys
 
