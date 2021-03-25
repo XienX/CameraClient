@@ -4,7 +4,7 @@
 # @Email : 1324548879@qq.com
 # @File : frameRecvThread.py
 # @notice ：
-
+import json
 import socket
 import traceback
 
@@ -15,8 +15,6 @@ from PyQt5.QtCore import *
 
 class FrameRecvThread(QtCore.QThread):
     frame_signal = pyqtSignal(np.ndarray)
-    # log_signal = pyqtSignal(str)
-    # enabled_signal = pyqtSignal(bool)
 
     def __init__(self, ip, port):
         super().__init__()
@@ -61,9 +59,10 @@ class FrameRecvThread(QtCore.QThread):
             if receivedSize == self.frameLen:
                 return np.frombuffer(bytesMessage, dtype=np.uint8).reshape(480, 640, 3)
         except BaseException as e:
-            print(e)
+            print(traceback.print_exc())
         return None
 
     def close(self):  # 关闭此线程
         self.isConnect = False
         self.connect.close()
+        print('recv def close(self)')

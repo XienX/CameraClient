@@ -60,14 +60,16 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
         self.portInput.setEnabled(b)
 
     def close_connect(self):  # 断开连接
-        self.controlThread.close()
+        # self.controlThread.close()
+        # self.controlThread.terminate()
+        # self.controlThread.wait()
+        self.controlThread.operationQueue.put({'code': 250})
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:  # 关闭程序
         try:
             super().closeEvent(a0)
             self.registerUI.close()
-            # if self.camera:
-            #     self.camera.close()
+
             if self.controlThread and self.controlThread.isRunning():
                 self.controlThread.close()
         except BaseException as e:

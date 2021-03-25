@@ -65,11 +65,18 @@ class ControlThread(QtCore.QThread):
                     self.frameRecvThread.frame_signal.connect(self.show_frame)
                     self.frameRecvThread.start()
 
-                    while 1:
-                        operation = self.operationQueue.get()
-                        self.logger.debug(operation)
+                    message = {'code': 220, 'camera': 0}  # 请求视频流
+                    self.connect.send(json.dumps(message).encode())
 
-                        self.connect.send(operation)
+                    while self.isConnect:
+                        operation = self.operationQueue.get()
+                        print(operation)
+
+                        if operation['code'] == 250:  # 断开连接
+                            self.close()
+                            break
+                        else:
+                            self.connect.send(operation)
 
                 elif message['code'] == 331:
                     self.log_signal.emit('无在线的摄像头设备，请上线摄像头后再登录')
@@ -105,19 +112,17 @@ class ControlThread(QtCore.QThread):
 
         self.enabled_signal.emit(True)
 
-    def queue_put(self):  # 放入操作指令
-        pass
+    # def queue_put(self):  # 放入操作指令
+    #     pass
 
     def show_frame(self, frame):  # 显示视频帧
         self.frame_signal.emit(frame)
 
-
     def close(self):  # 结束
-
-        if self.frameSendThread is not None and self.frameSendThread.isAlive:
-            self.frameSendThread.close()
+        if self.frameRecvThread is not None and self.frameRecvThread.isRunning():
+            self.frameRecvThread.close()
 
         self.isConnect = False
-        # self.connect.shutdown(2)
-        print('shutdown')
         self.connect.close()
+
+        print('shutdown')
