@@ -37,7 +37,7 @@ class FrameRecvThread(QtCore.QThread):
                     self.frame_signal.emit(frame)
 
         except BaseException as e:
-            print(traceback.print_exc())
+            traceback.print_exc()
 
         print('FrameRecvThread close')
 
@@ -49,7 +49,7 @@ class FrameRecvThread(QtCore.QThread):
             res = self.connect.recv(8192)
             if not res:  # 远端shutdown或close后，不断获取到空的结果
                 self.isConnect = False
-                print(len(res))
+                # print(len(res))
                 break
             receivedSize += len(res)  # 每次收到的服务端的数据有可能小于8192，所以必须用len判断
             bytesMessage += res
@@ -65,4 +65,4 @@ class FrameRecvThread(QtCore.QThread):
     def close(self):  # 关闭此线程
         self.isConnect = False
         self.connect.close()
-        print('recv def close(self)')
+        print('FrameRecvThread.close(self)')

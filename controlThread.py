@@ -76,7 +76,7 @@ class ControlThread(QtCore.QThread):
                             self.close()
                             break
                         else:
-                            self.connect.send(operation)
+                            self.connect.send(json.dumps(operation).encode())
 
                 elif message['code'] == 331:
                     self.log_signal.emit('无在线的摄像头设备，请上线摄像头后再登录')
@@ -106,10 +106,9 @@ class ControlThread(QtCore.QThread):
 
         except BaseException as e:
             traceback.print_exc()
-            self.log_signal.emit('连接已断开')
 
+        self.log_signal.emit('连接已断开')
         time.sleep(0.1)
-
         self.enabled_signal.emit(True)
 
     # def queue_put(self):  # 放入操作指令

@@ -33,6 +33,11 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
         self.closeButton.clicked.connect(self.close_connect)
         self.registerButton.clicked.connect(self.registerUI.show)
 
+        self.moveLeftButton.clicked.connect(lambda: self.move_servo('4'))
+        self.moveRightButton.clicked.connect(lambda: self.move_servo('6'))
+        self.moveUpButton.clicked.connect(lambda: self.move_servo('8'))
+        self.moveDownButton.clicked.connect(lambda: self.move_servo('2'))
+
     def connect_server(self):  # 连接服务器
         self.controlThread = ControlThread(self.userNameInput.text(), self.passwordInput.text(),
                                            self.ipInput.text(), int(self.portInput.text()))
@@ -64,6 +69,10 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
         # self.controlThread.terminate()
         # self.controlThread.wait()
         self.controlThread.operationQueue.put({'code': 250})
+
+    def move_servo(self, direction):  # 控制云台
+        if self.controlThread is not None and self.controlThread.isRunning():
+            self.controlThread.operationQueue.put({'code': 520, 'camera': 0, 'move': direction})
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:  # 关闭程序
         try:
