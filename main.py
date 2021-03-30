@@ -7,9 +7,8 @@
 
 import sys
 
-import cv2
+from PIL import ImageQt
 from PyQt5 import QtGui
-from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QApplication
 
 from clientWindow import Ui_MainWindow
@@ -49,9 +48,13 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
     def show_camera(self, frame):  # 显示一帧
         # print(frame)
         # show = cv2.resize(frame, (400, 300))
-        show = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        showImage = QImage(show.data, show.shape[1], show.shape[0], QImage.Format_RGB888)
-        self.cameraLabel.setPixmap(QPixmap.fromImage(showImage))
+
+        # show = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        # showImage = QImage(show.data, show.shape[1], show.shape[0], QImage.Format_RGB888)
+        # self.cameraLabel.setPixmap(QPixmap.fromImage(showImage))
+
+        self.cameraLabel.setPixmap(ImageQt.toqpixmap(frame))
+
 
     def print_log(self, log_str):  # UI上打印日志
         self.log.append(log_str)

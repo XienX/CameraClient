@@ -3,18 +3,20 @@
 # @Author : XieXin
 # @Email : 1324548879@qq.com
 # @File : frameRecvThread.py
-# @notice ：
+# @notice ：FrameRecvThread类--帧接受线程
+
 import json
 import socket
 import traceback
+from io import BytesIO
 
-import numpy as np
+from PIL import Image
 from PyQt5 import QtCore
 from PyQt5.QtCore import *
 
 
 class FrameRecvThread(QtCore.QThread):
-    frame_signal = pyqtSignal(np.ndarray)
+    frame_signal = pyqtSignal(Image.Image)
 
     def __init__(self, ip, port):
         super().__init__()
@@ -25,7 +27,7 @@ class FrameRecvThread(QtCore.QThread):
         self.connect = socket.socket()
         self.isConnect = True
 
-        self.frameLen = 921600  # 默认640*480
+        # self.frameLen = 921600  # 默认640*480
 
     def run(self):
         try:
@@ -33,6 +35,7 @@ class FrameRecvThread(QtCore.QThread):
 
             while self.isConnect:
                 frame = self.recv_frame()
+                # print(type(frame))  # <class 'PIL.JpegImagePlugin.JpegImageFile'>
                 if frame is not None:
                     self.frame_signal.emit(frame)
 
@@ -45,21 +48,28 @@ class FrameRecvThread(QtCore.QThread):
         receivedSize = 0
         bytesMessage = b''
 
-        while receivedSize < self.frameLen:
-            res = self.connect.recv(8192)
-            if not res:  # 远端shutdown或close后，不断获取到空的结果
-                self.isConnect = False
-                # print(len(res))
-                break
-            receivedSize += len(res)  # 每次收到的服务端的数据有可能小于8192，所以必须用len判断
-            bytesMessage += res
+        frameLenBytesMessage = self.connect.recv(1024).decode()
+        message = json.loads(frameLenBytesMessage)
 
-        # print(receivedSize)
-        try:
-            if receivedSize == self.frameLen:
-                return np.frombuffer(bytesMessage, dtype=np.uint8).reshape(480, 640, 3)
-        except BaseException as e:
-            print(traceback.print_exc())
+        if message['code'] == 500:
+            frameLen = message['frameLen']
+
+            while receivedSize < frameLen:
+                res = self.connect.recv(8192)
+                if not res:  # 远端shutdown或close后，不断获取到空的结果
+                    self.isConnect = False
+                    break
+                receivedSize += len(res)  # 每次收到的服务端的数据有可能小于8192，所以必须用len判断
+                bytesMessage += res
+
+            print(receivedSize)
+            try:
+                if receivedSize == frameLen:
+                    # return np.frombuffer(bytesMessage, dtype=np.uint8).reshape(480, 640, 3)
+                    return Image.open(BytesIO(bytesMessage))
+            except BaseException:
+                traceback.print_exc()
+
         return None
 
     def close(self):  # 关闭此线程

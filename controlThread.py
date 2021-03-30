@@ -3,7 +3,7 @@
 # @Author : XieXin
 # @Email : 1324548879@qq.com
 # @File : controlThread.py
-# @notice ：
+# @notice ：ControlThread类--连接控制线程
 
 import json
 import queue
@@ -11,7 +11,7 @@ import socket
 import time
 import traceback
 
-import numpy as np
+from PIL import Image
 from PyQt5 import QtCore
 from PyQt5.QtCore import *
 
@@ -21,7 +21,7 @@ from frameRecvThread import FrameRecvThread
 # 继承QThread
 class ControlThread(QtCore.QThread):
     #  通过类成员对象定义信号对象
-    frame_signal = pyqtSignal(np.ndarray)
+    frame_signal = pyqtSignal(Image.Image)
     log_signal = pyqtSignal(str)
     enabled_signal = pyqtSignal(bool)
 
