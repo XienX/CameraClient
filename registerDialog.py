@@ -106,7 +106,7 @@ class Ui_RegisterDialog(object):
 
     def retranslateUi(self, RegisterDialog):
         _translate = QtCore.QCoreApplication.translate
-        RegisterDialog.setWindowTitle(_translate("RegisterDialog", "RegisterDialog"))
+        RegisterDialog.setWindowTitle(_translate("RegisterDialog", "Register"))
         self.IP_R.setText(_translate("RegisterDialog", "服务器IP"))
         self.ipInputRegister.setText(_translate("RegisterDialog", "127.0.0.1"))
         self.PORT_R.setText(_translate("RegisterDialog", "Port"))
