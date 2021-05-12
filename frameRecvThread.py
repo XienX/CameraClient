@@ -27,8 +27,6 @@ class FrameRecvThread(QtCore.QThread):
         self.connect = socket.socket()
         self.isConnect = True
 
-        # self.frameLen = 921600  # 默认640*480
-
     def run(self):
         try:
             self.connect.connect((self.ip, self.port))
@@ -62,7 +60,7 @@ class FrameRecvThread(QtCore.QThread):
                 receivedSize += len(res)  # 每次收到的服务端的数据有可能小于8192，所以必须用len判断
                 bytesMessage += res
 
-            print(receivedSize)
+            # print(receivedSize)
             try:
                 if receivedSize == frameLen:
                     # return np.frombuffer(bytesMessage, dtype=np.uint8).reshape(480, 640, 3)

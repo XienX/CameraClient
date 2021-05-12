@@ -42,6 +42,7 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
         self.definitionInput.addItems(self.definitionList)
         self.definitionInput.currentIndexChanged[str].connect(self.change_definition)
         self.frameRateInput.addItems(self.frameRateList)
+        self.frameRateInput.currentIndexChanged[str].connect(self.change_rate)
 
         self.moveLeftButton.clicked.connect(lambda: self.move_servo('4'))
         self.moveRightButton.clicked.connect(lambda: self.move_servo('6'))
@@ -64,8 +65,11 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
             self.controlThread.operationQueue.put(
                 {'code': 510, 'camera': int(self.nowCameraNum), 'definition': int(definition[0:len(definition) - 1])})
 
-    def change_rate(self):  # 改变帧率
-        pass
+    def change_rate(self, rate):  # 改变帧率
+        print('change_rate  ' + rate)
+        if self.controlThread is not None and self.controlThread.isRunning():
+            self.controlThread.operationQueue.put(
+                {'code': 511, 'camera': int(self.nowCameraNum), 'rate': 0.04 if rate == '25FPS' else 0.1})
 
     def connect_server(self):  # 连接服务器
         self.controlThread = ControlThread(self.userNameInput.text(), self.passwordInput.text(),
@@ -78,12 +82,7 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
 
     def show_camera(self, frame):  # 显示一帧
         # print(frame)
-        # show = cv2.resize(frame, (400, 300))
-
-        # show = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        # showImage = QImage(show.data, show.shape[1], show.shape[0], QImage.Format_RGB888)
         # self.cameraLabel.setPixmap(QPixmap.fromImage(showImage))
-
         self.cameraLabel.setPixmap(ImageQt.toqpixmap(frame))
 
     def print_log(self, log_str):  # UI上打印日志
@@ -98,9 +97,6 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
         self.portInput.setEnabled(b)
 
     def close_connect(self):  # 断开连接
-        # self.controlThread.close()
-        # self.controlThread.terminate()
-        # self.controlThread.wait()
         self.controlThread.operationQueue.put({'code': 250})
 
     def set_camera_list(self, num):  # 设置摄像头列表范围

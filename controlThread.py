@@ -138,6 +138,7 @@ class ControlThread(QtCore.QThread):
         self.log_signal.emit('连接已断开')
         time.sleep(0.1)
         self.enabled_signal.emit(True)
+        print('controlThread close')
 
     # def queue_put(self):  # 放入操作指令
     #     pass
