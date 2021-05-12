@@ -105,8 +105,19 @@ class ControlThread(QtCore.QThread):
                                     self.camera_list_signal.emit(message['num'])
                                 else:
                                     self.log_signal.emit('此设备已掉线')
-                                    print(str(message) + 'controlThread 93')
+                                    print(str(message) + 'controlThread 108')
                                     break
+                            elif operation['code'] == 510 or operation['code'] == 511:  # 切换分辨率/帧率
+                                self.connect.send(json.dumps(operation).encode())
+
+                                jsonMessage = self.connect.recv(1024).decode()
+                                message = json.loads(jsonMessage)
+                                print(str(message) + 'controlThread 115')
+
+                                if message['code'] == 530:  # 设置成功
+                                    self.log_signal.emit('已切换')
+                                else:  # 430
+                                    self.log_signal.emit('操作失败')
 
                                 # else:
                                 #     self.connect.send(json.dumps(operation).encode())

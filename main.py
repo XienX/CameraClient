@@ -40,6 +40,7 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
         self.cameraNumInput.addItems(self.cameraList)
         self.cameraNumInput.currentIndexChanged[str].connect(self.change_camera)
         self.definitionInput.addItems(self.definitionList)
+        self.definitionInput.currentIndexChanged[str].connect(self.change_definition)
         self.frameRateInput.addItems(self.frameRateList)
 
         self.moveLeftButton.clicked.connect(lambda: self.move_servo('4'))
@@ -57,8 +58,11 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
             # 重置分辨率和帧率
             pass
 
-    def change_definition(self):  # 改变分辨率
-        pass
+    def change_definition(self, definition):  # 改变分辨率
+        print('change_definition  ' + definition)
+        if self.controlThread is not None and self.controlThread.isRunning():
+            self.controlThread.operationQueue.put(
+                {'code': 510, 'camera': int(self.nowCameraNum), 'definition': int(definition[0:len(definition) - 1])})
 
     def change_rate(self):  # 改变帧率
         pass
