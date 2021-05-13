@@ -27,8 +27,10 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
 
         self.cameraList = ['0']
         self.nowCameraNum = '0'
-        self.definitionList = ['480p', '360p']
+        self.definitionList = ['480P', '360P']
+        self.nowDefinition = '480P'
         self.frameRateList = ['25FPS', '10FPS']
+        self.nowRate = '25FPS'
 
         self.slot_init()
 
@@ -57,19 +59,24 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
             self.nowCameraNum = camera_num
 
             # 重置分辨率和帧率
-            pass
+            self.nowDefinition = '480P'
+            self.definitionInput.setCurrentIndex(0)
+            self.nowRate = '25FPS'
+            self.frameRateInput.setCurrentIndex(0)
 
     def change_definition(self, definition):  # 改变分辨率
         print('change_definition  ' + definition)
-        if self.controlThread is not None and self.controlThread.isRunning():
+        if definition != self.nowDefinition and self.controlThread is not None and self.controlThread.isRunning():
             self.controlThread.operationQueue.put(
                 {'code': 510, 'camera': int(self.nowCameraNum), 'definition': int(definition[0:len(definition) - 1])})
+            self.nowDefinition = definition
 
     def change_rate(self, rate):  # 改变帧率
         print('change_rate  ' + rate)
-        if self.controlThread is not None and self.controlThread.isRunning():
+        if rate != self.nowRate and self.controlThread is not None and self.controlThread.isRunning():
             self.controlThread.operationQueue.put(
                 {'code': 511, 'camera': int(self.nowCameraNum), 'rate': 0.04 if rate == '25FPS' else 0.1})
+            self.nowRate = rate
 
     def connect_server(self):  # 连接服务器
         self.controlThread = ControlThread(self.userNameInput.text(), self.passwordInput.text(),
@@ -79,6 +86,14 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
         self.controlThread.enabled_signal.connect(self.control_enabled)
         self.controlThread.camera_list_signal.connect(self.set_camera_list)
         self.controlThread.start()
+
+        # 重置
+        self.nowCameraNum = '0'
+        self.nowDefinition = '480P'
+        self.nowRate = '25FPS'
+        self.cameraNumInput.setCurrentIndex(0)
+        self.definitionInput.setCurrentIndex(0)
+        self.frameRateInput.setCurrentIndex(0)
 
     def show_camera(self, frame):  # 显示一帧
         # print(frame)
@@ -107,7 +122,7 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
 
     def move_servo(self, direction):  # 控制云台
         if self.controlThread is not None and self.controlThread.isRunning():
-            self.controlThread.operationQueue.put({'code': 520, 'camera': 0, 'move': direction})
+            self.controlThread.operationQueue.put({'code': 520, 'camera': int(self.nowCameraNum), 'move': direction})
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:  # 关闭程序
         try:

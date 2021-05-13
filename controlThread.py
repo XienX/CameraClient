@@ -53,7 +53,7 @@ class ControlThread(QtCore.QThread):
             self.connect.send(json.dumps(message).encode())
 
             # 接收登录回复消息
-            jsonMessage = self.connect.recv(64).decode()
+            jsonMessage = self.connect.recv(1024).decode()
             message = json.loads(jsonMessage)
             print(message)
 
@@ -119,8 +119,8 @@ class ControlThread(QtCore.QThread):
                                 else:  # 430
                                     self.log_signal.emit('操作失败')
 
-                                # else:
-                                #     self.connect.send(json.dumps(operation).encode())
+                            else:  # 动作指令
+                                self.connect.send(json.dumps(operation).encode())
                     else:
                         self.log_signal.emit('无在线的摄像头设备，请上线摄像头后再登录')
 
