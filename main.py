@@ -52,7 +52,7 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
         self.moveDownButton.clicked.connect(lambda: self.move_servo('2'))
 
     def change_camera(self, camera_num):  # 改变摄像头
-        print('change_camera  ' + camera_num)
+        # print('change_camera  ' + camera_num)
         if camera_num != '' and camera_num != self.nowCameraNum \
                 and self.controlThread is not None and self.controlThread.isRunning():
             self.controlThread.operationQueue.put({'code': 220, 'camera': int(camera_num)})
@@ -65,14 +65,14 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
             self.frameRateInput.setCurrentIndex(0)
 
     def change_definition(self, definition):  # 改变分辨率
-        print('change_definition  ' + definition)
+        # print('change_definition  ' + definition)
         if definition != self.nowDefinition and self.controlThread is not None and self.controlThread.isRunning():
             self.controlThread.operationQueue.put(
                 {'code': 510, 'camera': int(self.nowCameraNum), 'definition': int(definition[0:len(definition) - 1])})
             self.nowDefinition = definition
 
     def change_rate(self, rate):  # 改变帧率
-        print('change_rate  ' + rate)
+        # print('change_rate  ' + rate)
         if rate != self.nowRate and self.controlThread is not None and self.controlThread.isRunning():
             self.controlThread.operationQueue.put(
                 {'code': 511, 'camera': int(self.nowCameraNum), 'rate': 0.04 if rate == '25FPS' else 0.1})

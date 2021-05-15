@@ -69,11 +69,6 @@ class ControlThread(QtCore.QThread):
                     if message['num'] > 0:
                         self.camera_list_signal.emit(message['num'])
 
-                        # 接收摄像头列表
-                        # jsonMessage = self.connect.recv(1024).decode()
-                        # message = json.loads(jsonMessage)
-                        # print(str(message) + 'controlThread 72')
-
                         # message = {'code': 220, 'camera': 0}  # 请求视频流
                         # self.connect.send(json.dumps(message).encode())
 
@@ -88,39 +83,44 @@ class ControlThread(QtCore.QThread):
                         self.frameRecvThread.start()
 
                         while self.isConnect:
-                            operation = self.operationQueue.get()
-                            print(operation)
-
-                            if operation['code'] == 250:  # 断开连接
-                                self.close()
-                                break
-                            elif operation['code'] == 220:  # 切换摄像头信号
-                                self.connect.send(json.dumps(operation).encode())
-                                jsonMessage = self.connect.recv(1024).decode()
-                                message = json.loads(jsonMessage)
-                                print(str(message) + 'controlThread 101')
-
-                                if message['code'] == 321:  # 摄像头切换成功
-                                    self.log_signal.emit('已切换摄像头画面')
-                                    self.camera_list_signal.emit(message['num'])
-                                else:
-                                    self.log_signal.emit('此设备已掉线')
-                                    print(str(message) + 'controlThread 108')
+                            try:
+                                operation = self.operationQueue.get(timeout=30)
+                                print(operation)
+                            except queue.Empty:  # 心跳包
+                                print("queue.Empty")
+                                message = {'code': 340}
+                                self.connect.send(json.dumps(message).encode())
+                            else:
+                                if operation['code'] == 250:  # 断开连接
+                                    self.close()
                                     break
-                            elif operation['code'] == 510 or operation['code'] == 511:  # 切换分辨率/帧率
-                                self.connect.send(json.dumps(operation).encode())
+                                elif operation['code'] == 220:  # 切换摄像头信号
+                                    self.connect.send(json.dumps(operation).encode())
+                                    jsonMessage = self.connect.recv(1024).decode()
+                                    message = json.loads(jsonMessage)
+                                    print(str(message) + 'controlThread 101')
 
-                                jsonMessage = self.connect.recv(1024).decode()
-                                message = json.loads(jsonMessage)
-                                print(str(message) + 'controlThread 115')
+                                    if message['code'] == 321:  # 摄像头切换成功
+                                        self.log_signal.emit('已切换摄像头画面')
+                                        self.camera_list_signal.emit(message['num'])
+                                    else:
+                                        self.log_signal.emit('此设备已掉线')
+                                        print(str(message) + 'controlThread 108')
+                                        break
+                                elif operation['code'] == 510 or operation['code'] == 511:  # 切换分辨率/帧率
+                                    self.connect.send(json.dumps(operation).encode())
 
-                                if message['code'] == 530:  # 设置成功
-                                    self.log_signal.emit('已切换')
-                                else:  # 430
-                                    self.log_signal.emit('操作失败')
+                                    jsonMessage = self.connect.recv(1024).decode()
+                                    message = json.loads(jsonMessage)
+                                    print(str(message) + 'controlThread 115')
 
-                            else:  # 动作指令
-                                self.connect.send(json.dumps(operation).encode())
+                                    if message['code'] == 530:  # 设置成功
+                                        self.log_signal.emit('已切换')
+                                    else:  # 430
+                                        self.log_signal.emit('操作失败')
+
+                                else:  # 动作指令
+                                    self.connect.send(json.dumps(operation).encode())
                     else:
                         self.log_signal.emit('无在线的摄像头设备，请上线摄像头后再登录')
 
@@ -138,6 +138,10 @@ class ControlThread(QtCore.QThread):
         self.log_signal.emit('连接已断开')
         time.sleep(0.1)
         self.enabled_signal.emit(True)
+
+        if self.frameRecvThread is not None and self.frameRecvThread.isRunning():
+            self.frameRecvThread.close()
+
         print('controlThread close')
 
     # def queue_put(self):  # 放入操作指令
@@ -147,9 +151,6 @@ class ControlThread(QtCore.QThread):
         self.frame_signal.emit(frame)
 
     def close(self):  # 结束
-        if self.frameRecvThread is not None and self.frameRecvThread.isRunning():
-            self.frameRecvThread.close()
-
         self.isConnect = False
         self.connect.close()
 
