@@ -9,10 +9,13 @@ import sys
 
 from PIL import ImageQt
 from PyQt5 import QtGui
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtWidgets import QMainWindow, QApplication
 
 from clientWindow import Ui_MainWindow
 from register import RegisterUI
+from fullScreen import fullScreenUI
 from controlThread import ControlThread
 
 
@@ -22,6 +25,11 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         self.registerUI = RegisterUI()
+        self.fullScreenUI = fullScreenUI()
+        screenRect = QGuiApplication.primaryScreen().availableVirtualGeometry()
+        # print(f'{screenRect.width()}, {screenRect.height()}')
+        self.fullScreenUI.resize(screenRect.width(), screenRect.height()-28)
+        self.fullScreenUI.cameraLabel.resize(screenRect.width(), screenRect.height()-28)
 
         self.controlThread = None
 
@@ -38,6 +46,7 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
         self.connectButton.clicked.connect(self.connect_server)
         self.closeButton.clicked.connect(self.close_connect)
         self.registerButton.clicked.connect(self.registerUI.show)
+        self.fullScreenButton.clicked.connect(self.fullScreenUI.showMaximized)
 
         self.cameraNumInput.addItems(self.cameraList)
         self.cameraNumInput.currentIndexChanged[str].connect(self.change_camera)
@@ -98,7 +107,11 @@ class ClientMainWindow(QMainWindow, Ui_MainWindow):
     def show_camera(self, frame):  # 显示一帧
         # print(frame)
         # self.cameraLabel.setPixmap(QPixmap.fromImage(showImage))
-        self.cameraLabel.setPixmap(ImageQt.toqpixmap(frame))
+        if self.fullScreenUI.isHidden():
+            self.cameraLabel.setPixmap(ImageQt.toqpixmap(frame))
+        else:
+            self.fullScreenUI.cameraLabel.setPixmap(ImageQt.toqpixmap(frame).scaled(
+                self.fullScreenUI.cameraLabel.width(), self.fullScreenUI.cameraLabel.height(), Qt.KeepAspectRatio))
 
     def print_log(self, log_str):  # UI上打印日志
         self.log.append(log_str)
