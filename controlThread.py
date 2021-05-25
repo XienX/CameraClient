@@ -55,7 +55,7 @@ class ControlThread(QtCore.QThread):
             # 接收登录回复消息
             jsonMessage = self.connect.recv(1024).decode()
             message = json.loads(jsonMessage)
-            print(message)
+            # print(message)
 
             if message['code'] == 300:
                 self.log_signal.emit('登录成功')
@@ -63,7 +63,7 @@ class ControlThread(QtCore.QThread):
                 # 接收摄像头列表消息
                 jsonMessage = self.connect.recv(1024).decode()
                 message = json.loads(jsonMessage)
-                print(message)
+                # print(message)
 
                 if message['code'] == 321:  # 摄像头列表
                     if message['num'] > 0:
@@ -75,7 +75,7 @@ class ControlThread(QtCore.QThread):
                         # 接受视频流连接请求
                         jsonMessage = self.connect.recv(1024).decode()
                         message = json.loads(jsonMessage)
-                        print(message)
+                        # print(message)
 
                         # 创建视频接收线程
                         self.frameRecvThread = FrameRecvThread(self.ip, message['port'])
@@ -85,9 +85,9 @@ class ControlThread(QtCore.QThread):
                         while self.isConnect:
                             try:
                                 operation = self.operationQueue.get(timeout=30)
-                                print(operation)
+                                # print(operation)
                             except queue.Empty:  # 心跳包
-                                print("queue.Empty")
+                                # print("queue.Empty")
                                 message = {'code': 340}
                                 self.connect.send(json.dumps(message).encode())
                             else:
@@ -98,21 +98,21 @@ class ControlThread(QtCore.QThread):
                                     self.connect.send(json.dumps(operation).encode())
                                     jsonMessage = self.connect.recv(1024).decode()
                                     message = json.loads(jsonMessage)
-                                    print(str(message) + 'controlThread 101')
+                                    # print(str(message) + 'controlThread 101')
 
                                     if message['code'] == 321:  # 摄像头切换成功
                                         self.log_signal.emit('已切换摄像头画面')
                                         self.camera_list_signal.emit(message['num'])
                                     else:
                                         self.log_signal.emit('此设备已掉线')
-                                        print(str(message) + 'controlThread 108')
+                                        # print(str(message) + 'controlThread 108')
                                         break
                                 elif operation['code'] == 510 or operation['code'] == 511:  # 切换分辨率/帧率
                                     self.connect.send(json.dumps(operation).encode())
 
                                     jsonMessage = self.connect.recv(1024).decode()
                                     message = json.loads(jsonMessage)
-                                    print(str(message) + 'controlThread 115')
+                                    # print(str(message) + 'controlThread 115')
 
                                     if message['code'] == 530:  # 设置成功
                                         self.log_signal.emit('已切换')
@@ -133,7 +133,8 @@ class ControlThread(QtCore.QThread):
                 self.log_signal.emit(f'非预期的code {message["code"]}')
 
         except BaseException as e:
-            traceback.print_exc()
+            # traceback.print_exc()
+            print(e)
 
         self.log_signal.emit('连接已断开')
         time.sleep(0.1)
@@ -142,7 +143,7 @@ class ControlThread(QtCore.QThread):
         if self.frameRecvThread is not None and self.frameRecvThread.isRunning():
             self.frameRecvThread.close()
 
-        print('controlThread close')
+        # print('controlThread close')
 
     # def queue_put(self):  # 放入操作指令
     #     pass
@@ -154,4 +155,4 @@ class ControlThread(QtCore.QThread):
         self.isConnect = False
         self.connect.close()
 
-        print('shutdown')
+        # print('shutdown')

@@ -5,7 +5,6 @@
 # @File : register.py
 # @notice ：注册页面、注册连接线程
 
-
 import json
 import socket
 
@@ -87,7 +86,7 @@ class RegisterThread(QtCore.QThread):
 
             jsonMessage = self.connect.recv(1024).decode()
             message = json.loads(jsonMessage)
-            print(message)
+            # print(message)
 
             if message['code'] == 310:  # 注册成功
                 self.tip_signal.emit('已注册')

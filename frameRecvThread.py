@@ -5,7 +5,6 @@
 # @File : frameRecvThread.py
 # @notice ：FrameRecvThread类--帧接受线程
 
-import json
 import socket
 import time
 import traceback
@@ -40,9 +39,10 @@ class FrameRecvThread(QtCore.QThread):
                 time.sleep(0.02)
 
         except BaseException as e:
-            traceback.print_exc()
+            # traceback.print_exc()
+            print(e)
 
-        print('FrameRecvThread close')
+        # print('FrameRecvThread close')
 
     def recv_frame(self):  # 根据数据长度接受一帧数据，返回 numpy.ndarray
         try:
@@ -54,7 +54,7 @@ class FrameRecvThread(QtCore.QThread):
             # time.sleep(0.01)
 
             frameLen = int.from_bytes(self.connect.recv(4), byteorder='big')
-            print(f'frameLen {frameLen}')
+            # print(f'frameLen {frameLen}')
             if frameLen == 0:
                 self.isConnect = False
                 return None
@@ -84,11 +84,12 @@ class FrameRecvThread(QtCore.QThread):
             if receivedSize == frameLen:
                 return Image.open(BytesIO(bytesMessage))
         except BaseException:
-            traceback.print_exc()
+            # traceback.print_exc()
+            print(e)
 
         return None
 
     def close(self):  # 关闭此线程
         self.isConnect = False
         self.connect.close()
-        print('FrameRecvThread.close(self)')
+        # print('FrameRecvThread.close(self)')
